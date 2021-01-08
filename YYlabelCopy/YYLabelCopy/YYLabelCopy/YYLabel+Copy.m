@@ -116,7 +116,7 @@ static const void *k_yy_copyEndPosition = @"yy_copyEndPosition";
        CFIndex index = [self touchContentOffsetInView:self point:point frameRef:self.textLayout.frame];
        ///判断是否在选中区域
        if (index != -1 && index < self.textLayout.text.length) {
-           [self showMagnifier];
+           //[self showMagnifier];
            self.magnifiterView.touchPoint = point;
            self.yy_copyStartPosition = index;
            self.yy_copyEndPosition = index + 2;

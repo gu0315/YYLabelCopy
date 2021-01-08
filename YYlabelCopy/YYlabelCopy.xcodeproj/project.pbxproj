@@ -102,7 +102,6 @@
 				71B4CA2015C2F5B7AD13533C /* Pods-YYLabelCopy.debug.xcconfig */,
 				1C55FB2FA0AA21C560294B54 /* Pods-YYLabelCopy.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -178,9 +177,9 @@
 			isa = PBXGroup;
 			children = (
 				E6F5F00325A861ED00668E2A /* drag-dot@2x.png */,
-				E6F5F00425A861ED00668E2A /* MagnifiterView.h */,
 				E6F5F00525A861ED00668E2A /* YYLabel+Copy.h */,
 				E6F5F00625A861ED00668E2A /* YYLabel+Copy.m */,
+				E6F5F00425A861ED00668E2A /* MagnifiterView.h */,
 				E6F5F00725A861ED00668E2A /* MagnifiterView.m */,
 			);
 			path = YYLabelCopy;
@@ -524,6 +523,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = GM4UWN5PN3;
 				INFOPLIST_FILE = YYLabelCopy/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -543,6 +543,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = GM4UWN5PN3;
 				INFOPLIST_FILE = YYLabelCopy/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
