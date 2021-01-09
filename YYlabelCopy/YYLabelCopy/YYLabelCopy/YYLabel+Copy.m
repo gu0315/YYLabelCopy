@@ -9,6 +9,7 @@
 #import <CoreText/CoreText.h>
 #import "YYTextAsyncLayer.h"
 #import <UIKit/UIKit.h>
+#import <YYText.h>
 #import <Foundation/Foundation.h>
 // 添加runtime头文件
 #import <objc/runtime.h>
@@ -392,7 +393,8 @@ static const void *k_yy_copyEndPosition = @"yy_copyEndPosition";
     if ([self becomeFirstResponder]) {
         UIMenuController *menuController = [UIMenuController sharedMenuController];
         UIMenuItem *menuItemCopy = [[UIMenuItem alloc] initWithTitle:@"复制" action:@selector(menuCopy:)];
-        NSArray *menus = @[menuItemCopy];
+        UIMenuItem *menuItemHighlight = [[UIMenuItem alloc] initWithTitle:@"高亮" action:@selector(highlight:)];
+        NSArray *menus = @[menuItemCopy,menuItemHighlight];
         [menuController setMenuItems:menus];
         //菜单箭头方向(默认会自动判定)
         [menuController setTargetRect:[self getMenuRect] inView:self];
@@ -401,11 +403,12 @@ static const void *k_yy_copyEndPosition = @"yy_copyEndPosition";
 }
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender{
-    if (action ==@selector(menuCopy:)){
+    if (action ==@selector(menuCopy:) || action == @selector(highlight:)){
         return YES;
     }
-    return NO;//隐藏系统默认的菜单项
+    return NO;
 }
+
 
 - (BOOL)canBecomeFirstResponder {
     return YES;
@@ -423,6 +426,20 @@ static const void *k_yy_copyEndPosition = @"yy_copyEndPosition";
     NSLog(@"复制的数据-----------\n%@",str);
 }
 
+///高亮
+- (void)highlight:(UIMenuItem *)item {
+    if ((self.yy_copyStartPosition < 0 || self.yy_copyEndPosition > self.textLayout.text.length) || self.textLayout.text == nil) {
+        return;
+    }
+    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithAttributedString:self.textLayout.text];
+    [text yy_setTextHighlightRange:NSMakeRange(self.yy_copyStartPosition, self.yy_copyEndPosition - self.yy_copyStartPosition)
+                             color:[UIColor greenColor]
+                   backgroundColor:[UIColor whiteColor]
+                         tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect){
+                         }];
+    self.attributedText = text;
+    [self removeALlcopy];
+}
 #pragma mark - 放大镜 Magnifier View
 ///显示放大镜
 -(void)showMagnifier{
