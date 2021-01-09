@@ -1,6 +1,4 @@
-# YYLabelCopy
-
-#####YYLabe添加复制功能
+###YYLabel添加复制功能
 
 [![sKeWGQ.png](https://s3.ax1x.com/2021/01/08/sKeWGQ.png)](https://imgchr.com/i/sKeWGQ)
 
