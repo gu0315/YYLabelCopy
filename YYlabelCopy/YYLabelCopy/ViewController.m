@@ -41,7 +41,8 @@
     // Generate a text layout.
     YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:text];
     label.frame = CGRectMake(0, 0, self.view.frame.size.width,layout.textBoundingSize.height);
-    label.textLayout = layout;
+    //label.textLayout = layout;
+    label.attributedText = text;
     scrollView.contentSize = CGSizeMake(self.view.frame.size.width, label.frame.size.height);
     ///复制使用
     [label addGestureRecognizer];

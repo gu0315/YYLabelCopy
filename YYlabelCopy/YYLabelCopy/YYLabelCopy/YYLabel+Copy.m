@@ -431,12 +431,17 @@ static const void *k_yy_copyEndPosition = @"yy_copyEndPosition";
     if ((self.yy_copyStartPosition < 0 || self.yy_copyEndPosition > self.textLayout.text.length) || self.textLayout.text == nil) {
         return;
     }
+    NSRange range = NSMakeRange(self.yy_copyStartPosition, self.yy_copyEndPosition - self.yy_copyStartPosition);
     NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithAttributedString:self.textLayout.text];
-    [text yy_setTextHighlightRange:NSMakeRange(self.yy_copyStartPosition, self.yy_copyEndPosition - self.yy_copyStartPosition)
-                             color:[UIColor greenColor]
-                   backgroundColor:[UIColor whiteColor]
-                         tapAction:^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect){
-                         }];
+    YYTextBorder *border = [YYTextBorder new];
+    border.fillColor = [UIColor colorWithRed:227/255.0 green:207/255.0 blue:87/255.0 alpha:0.2];
+    border.strokeColor = [UIColor redColor];
+    border.insets = UIEdgeInsetsMake(0.5, 0.5, 0.5, 1);
+    //normal状态边框
+    [text yy_setTextBackgroundBorder:border range:range];
+    YYTextHighlight *highlight = [YYTextHighlight new];
+    [highlight setColor: [UIColor grayColor]];
+    [highlight setBackgroundBorder:border];
     self.attributedText = text;
     [self removeALlcopy];
 }
