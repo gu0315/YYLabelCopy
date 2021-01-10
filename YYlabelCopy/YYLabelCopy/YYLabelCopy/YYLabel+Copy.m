@@ -112,6 +112,8 @@ static const void *k_yy_copyEndPosition = @"yy_copyEndPosition";
 ///长按手势
 -(void)longCurrentViewGesture:(UILongPressGestureRecognizer*)gesture{
     CGPoint point = [gesture locationInView:self];
+    ///TODO判断是否在高亮区域
+
     if (gesture.state == UIGestureRecognizerStateBegan ||
        gesture.state == UIGestureRecognizerStateChanged) {
        CFIndex index = [self touchContentOffsetInView:self point:point frameRef:self.textLayout.frame];
@@ -389,7 +391,7 @@ static const void *k_yy_copyEndPosition = @"yy_copyEndPosition";
 }
 
 #pragma mark Show Menu
--(void)showMenu{
+-(void)showMenu {
     if ([self becomeFirstResponder]) {
         UIMenuController *menuController = [UIMenuController sharedMenuController];
         UIMenuItem *menuItemCopy = [[UIMenuItem alloc] initWithTitle:@"复制" action:@selector(menuCopy:)];
@@ -408,7 +410,6 @@ static const void *k_yy_copyEndPosition = @"yy_copyEndPosition";
     }
     return NO;
 }
-
 
 - (BOOL)canBecomeFirstResponder {
     return YES;
@@ -442,6 +443,12 @@ static const void *k_yy_copyEndPosition = @"yy_copyEndPosition";
     YYTextHighlight *highlight = [YYTextHighlight new];
     [highlight setColor: [UIColor grayColor]];
     [highlight setBackgroundBorder:border];
+    highlight.tapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+        ///弹出取消View
+        
+
+    };
+    [text yy_setTextHighlight:highlight range:range];
     self.attributedText = text;
     [self removeALlcopy];
 }
