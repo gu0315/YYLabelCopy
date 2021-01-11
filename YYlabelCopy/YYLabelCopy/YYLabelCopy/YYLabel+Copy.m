@@ -405,10 +405,10 @@ static const void *k_yy_copyEndPosition = @"yy_copyEndPosition";
 }
 
 - (BOOL)canPerformAction:(SEL)action withSender:(id)sender{
-    if (action ==@selector(menuCopy:) || action == @selector(highlight:)){
+    if (action ==@selector(menuCopy:) || action == @selector(highlight:) || action == @selector(itemHighlightCopy:) || action == @selector(menuItemHighlight:)){
         return YES;
     }
-    return NO;
+    return NO;//隐藏系统默认的菜单项
 }
 
 - (BOOL)canBecomeFirstResponder {
@@ -426,32 +426,76 @@ static const void *k_yy_copyEndPosition = @"yy_copyEndPosition";
     pasteboard.string = str;
     NSLog(@"复制的数据-----------\n%@",str);
 }
-
 ///高亮
 - (void)highlight:(UIMenuItem *)item {
-    if ((self.yy_copyStartPosition < 0 || self.yy_copyEndPosition > self.textLayout.text.length) || self.textLayout.text == nil) {
+   if ((self.yy_copyStartPosition < 0 || self.yy_copyEndPosition > self.textLayout.text.length) || self.textLayout.text == nil) {
+       return;
+   }
+   NSRange range = NSMakeRange(self.yy_copyStartPosition, self.yy_copyEndPosition - self.yy_copyStartPosition);
+   NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithAttributedString:self.textLayout.text];
+   YYTextBorder *border = [YYTextBorder new];
+   border.fillColor = [UIColor colorWithRed:227/255.0 green:207/255.0 blue:87/255.0 alpha:0.2];
+   border.strokeColor = [UIColor redColor];
+   border.insets = UIEdgeInsetsMake(0.5, 0.5, 0.5, 1);
+   //normal状态边框
+   [text yy_setTextBackgroundBorder:border range:range];
+   YYTextHighlight *highlight = [YYTextHighlight new];
+   [highlight setBackgroundBorder:border];
+   __weak __typeof(self)weakSelf = self;
+   highlight.tapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
+       ///弹出取消高亮
+       [self becomeFirstResponder];
+       NSMutableDictionary *dic = [[NSMutableDictionary alloc] init];
+       [dic setValue:[NSNumber valueWithRange:range] forKey:@"range"];
+       [dic setValue:[NSNumber valueWithCGRect:rect] forKey:@"rect"];
+       [weakSelf becomeFirstResponder];
+       UIMenuController *menuController = [UIMenuController sharedMenuController];
+       UIMenuItem *menuItemCopy = [[UIMenuItem alloc] initWithTitle:@"复制" action:@selector(itemHighlightCopy:)];
+       objc_setAssociatedObject(menuController, @"menuItemCopy", dic, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+       UIMenuItem *menuItemHighlight = [[UIMenuItem alloc] initWithTitle:@"取消高亮" action:@selector(menuItemHighlight:)];
+       objc_setAssociatedObject(menuController, @"menuItemHighlight", dic, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+       NSArray *menus = @[menuItemCopy,menuItemHighlight];
+       [menuController setMenuItems:menus];
+       //菜单箭头方向(默认会自动判定)
+       [menuController setTargetRect:rect inView:weakSelf];
+       [menuController setMenuVisible:YES animated:YES];
+   };
+   [text yy_setTextHighlight:highlight range:range];
+   self.attributedText = text;
+   [self removeALlcopy];
+}
+
+- (void)itemHighlightCopy:(UIMenuItem *)item {
+    NSDictionary *dic = objc_getAssociatedObject(item, @"menuItemCopy");
+    if (dic == nil) {
         return;
     }
-    NSRange range = NSMakeRange(self.yy_copyStartPosition, self.yy_copyEndPosition - self.yy_copyStartPosition);
+    NSRange range = [[dic objectForKey:@"range"] rangeValue];
+    NSString *str = [self.text substringWithRange:range];
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    pasteboard.string = str;
+    NSLog(@"复制的数据-----------\n%@",str);
+
+}
+///取消高亮
+- (void)menuItemHighlight:(UIMenuItem *)item {
+    NSDictionary *dic = objc_getAssociatedObject(item, @"menuItemHighlight");
+    if (dic == nil) {
+        return;
+    }
+    NSRange range = [[dic objectForKey:@"range"] rangeValue];
     NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithAttributedString:self.textLayout.text];
     YYTextBorder *border = [YYTextBorder new];
-    border.fillColor = [UIColor colorWithRed:227/255.0 green:207/255.0 blue:87/255.0 alpha:0.2];
-    border.strokeColor = [UIColor redColor];
+    border.fillColor = [UIColor whiteColor];
+    border.strokeColor = [UIColor whiteColor];
     border.insets = UIEdgeInsetsMake(0.5, 0.5, 0.5, 1);
-    //normal状态边框
     [text yy_setTextBackgroundBorder:border range:range];
     YYTextHighlight *highlight = [YYTextHighlight new];
-    [highlight setColor: [UIColor grayColor]];
     [highlight setBackgroundBorder:border];
-    highlight.tapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
-        ///弹出取消View
-        
-
-    };
     [text yy_setTextHighlight:highlight range:range];
     self.attributedText = text;
-    [self removeALlcopy];
 }
+
 #pragma mark - 放大镜 Magnifier View
 ///显示放大镜
 -(void)showMagnifier{
